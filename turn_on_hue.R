@@ -33,3 +33,19 @@ httr::PUT(light1_state, body = to_json(bri = 127))
 
 PUT(light1_state, body = to_json(alert = "select"))
 
+# turn a random light off
+res <- httr::GET(api_url)
+num_lights <- res %>% content %>% length
+random_light_num <- sample(seq_len(num_lights), size = 1)
+
+# retain last state
+light_url <- file.path(api_url, random_light_num)
+prev_state <- GET(light_url) %>% content
+prev_state$name
+
+light_state <- file.path(light_url, "state")
+PUT(light_state, body = to_json(on = FALSE))
+Sys.sleep(1)
+PUT(light_state, body = to_json(on = prev_state$state$on))
+
+
